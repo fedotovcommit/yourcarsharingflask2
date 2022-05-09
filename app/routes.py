@@ -43,13 +43,10 @@ def auto_create():
 def item_update(item_id):
     item = Auto.query.get(item_id)
     journal1 = Journal.query.filter_by(auto_id=item_id).all()
-
     if journal1:
         for j in journal1:
-            diff = datetime.now()
             diff = datetime.strptime(j.time_end, '%d.%m.%Y %H:%M') - datetime.strptime(j.time_start, '%d.%m.%Y %H:%M')
             j.price = float(diff.seconds / 60) * float(item.price)
-
     form = ItemUpdateForm(title=item.title, price=item.price.__round__(1), description=item.description, main_pic=item.main_pic, is_available=item.is_available, is_automatic=item.is_automatic)
     success_url = url_for('index')
     if form.validate_on_submit():
@@ -65,7 +62,6 @@ def item_update(item_id):
                 logo = f'images/items/{file.filename}'
                 file.save(os.path.join(app.config['STATIC_ROOT'], logo))
                 item.main_pic = logo
-            # success_url = url_for('item_detail', item_id=item_id)
         elif action == 'del':
             db.session.delete(item)
         db.session.commit()
@@ -131,13 +127,11 @@ def rental_log():
     item_journal = Journal.query.all()
     list_id = []
     list_car = []
-
     if item_journal:
         for j in item_journal:
             item = Auto.query.filter_by(id=j.auto_id).first()
             list_id.append(item.id)
             dict_car = {'id': 0, 'title': '', 'count': 0, 'time': 0, 'cost': 0}
-            # diff = datetime.now()
             diff = datetime.strptime(j.time_end, '%d.%m.%Y %H:%M') - datetime.strptime(j.time_start,
                                                                                         '%d.%m.%Y %H:%M')
             if list_car:
@@ -146,9 +140,7 @@ def rental_log():
                     if is_append:
                         break
                     if item.title == car['title']:
-
                         car['count'] += 1
-
                         car['time'] += float(diff.seconds / 60)
                         car['cost'] += float(diff.seconds / 60) * float(item.price)
                     else:
@@ -167,7 +159,6 @@ def rental_log():
                             dict_car['cost'] = float(diff.seconds / 60) * float(item.price)
                             list_car.append(dict_car)
                             is_append = True
-
             else:
                 dict_car['title'] = item.title
                 dict_car['count'] = 1
@@ -176,7 +167,5 @@ def rental_log():
                 dict_car['time'] = float(diff.seconds / 60)
                 dict_car['cost'] = float(diff.seconds / 60) * float(item.price)
                 list_car.append(dict_car)
-
-    # result = list({d['id']: d for d in list_car}.values())
 
     return render_template('rental_log.html', item_journal=list_car)
