@@ -17,12 +17,6 @@ def index():
     auto_list = Auto.query.all()
     return render_template('index.html', auto_list=auto_list)
 
-@app.route('/new-user')
-def new_user():
-    new_user = User(name='Вася Пупкин')
-    db.session.add(new_user)
-    db.session.commit()
-    return render_template('new_user.html', new_user=new_user)
 
 @app.route('/auto-create', methods=['GET', 'POST'])
 def auto_create():
